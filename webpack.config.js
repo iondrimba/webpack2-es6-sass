@@ -44,6 +44,9 @@ var config = {
               query: {
                sourceMap: true
               },
+            },
+            {
+              loader: "postcss-loader"
             }
           ],
         })
