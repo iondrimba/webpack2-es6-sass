@@ -8,19 +8,25 @@ var autoprefixer = require('autoprefixer');
 var isProduction = process.env.NODE_ENV == 'production';
 
 var config = {
+  devtool: 'source-map',
+  context: __dirname,
+  stats: 'errors-only',
+  bail: true,
+  cache: isProduction,
+  watch: !isProduction,
   entry: {
     index: './src/js/app.js'
   },
   output: {
     path: path.resolve(__dirname, 'public'),
     filename: 'js/[name].js',
-    publicPath: isProduction ? '' : 'http://localhost:9001/public',
+    publicPath: '',
   },
   devServer: {
     contentBase: [path.join(__dirname, 'public'), path.join(__dirname, 'src/index.html')],
     historyApiFallback: true,
     hot: true,
-    port: 9001,
+    port: 9000,
     watchContentBase: !isProduction
   },
 
@@ -28,23 +34,29 @@ var config = {
     rules: [
       {
         test: /\.scss$/,
-        use: [{
-          loader: 'css-loader',
-          options: {
-            modules: true,
-            sourceMap: true,
-            localIdentName: '[local]'
+        use: [
+          {
+            loader: 'style-loader'
           },
-        },
-        {
-          loader: 'sass-loader',
-          options: {
-            sourceMap: true
-          }
-        },
-        {
-          loader: 'postcss-loader'
-        }]
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              sourceMap: isProduction,
+              importLoaders: 1,
+              localIdentName: '[local]'
+            },
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: isProduction,
+              importLoaders: 2
+            }
+          },
+          {
+            loader: 'postcss-loader'
+          }]
       },
       {
         test: /\.js?$/,
@@ -77,7 +89,7 @@ var config = {
         ]
       },
       {
-        test: /\.(ttf|otf|eot|svg|woff(2)?)?$/,
+        test: /\.(woff|woff2?)?$/,
         use: [
           'file-loader',
           {
@@ -97,9 +109,7 @@ var config = {
     ],
     extensions: ['.js', '.json', '.css']
   },
-  devtool: 'source-map',
-  context: __dirname,
-  stats: 'errors-only',
+
 
   plugins: [
     new webpack.LoaderOptionsPlugin({
@@ -126,10 +136,7 @@ var config = {
       template: './src/index.html',
       filename: 'index.html'
     })
-  ],
-  bail: true,
-  cache: isProduction,
-  watch: !isProduction,
+  ]
 }
 
 if (isProduction) {
