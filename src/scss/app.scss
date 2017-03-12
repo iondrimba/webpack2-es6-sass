@@ -1,0 +1,24 @@
+$base-color: #fff;
+
+@font-face {
+  font-family: 'abeezee';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/fonts/regular.woff2') format('woff2'), url('/fonts/regular.woff') format('woff');
+}
+
+body {
+  background-color: darkslateblue;
+  color: $base-color;
+  display: flex;
+  flex-direction: column;
+  font-family: 'abeezee';
+}
+
+img {
+  width: 100%;
+}
+
+h1 {
+  font-family: 'abeezee';
+}

@@ -1,3 +1,3 @@
-import css from '../css/app.css';
+import css from '../scss/app.scss';
 
-console.log('Hello World 111');
+console.log('Hello World 222');

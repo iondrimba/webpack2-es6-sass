@@ -3,6 +3,8 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var CopyWebpackPlugin = require("copy-webpack-plugin");
+var autoprefixer = require('autoprefixer');
+
 var isProduction = process.env.NODE_ENV == "production";
 
 var config = {
@@ -25,18 +27,26 @@ var config = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: [
-          {
-            loader: "style-loader"
-          },
-          {
-            loader: "css-loader", options: {
-              modules: true,
-              sourceMap: true,
-              localIdentName: '[local]'
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          loader: [
+            {
+              loader: "css-loader",
+              query: {
+                modules: true,
+                sourceMap: true,
+                localIdentName: '[local]'
+              },
+            },
+            {
+              loader: "sass-loader",
+              query: {
+               sourceMap: true
+              },
             }
-          }]
+          ],
+        })
       },
       {
         test: /\.js?$/,
@@ -69,13 +79,13 @@ var config = {
         ]
       },
       {
-        test: /\.(woff2|woff)?$/,
+        test: /\.(ttf|otf|eot|svg|woff(2)?)?$/,
         use: [
           "file-loader",
           {
             loader: "file-loader",
             options: {
-              name: "fonts/[name].[ext]"
+              name: "[name].[ext]"
             }
           }
         ]
@@ -92,7 +102,18 @@ var config = {
   devtool: "source-map",
   context: __dirname,
   stats: "errors-only",
+
   plugins: [
+    new webpack.LoaderOptionsPlugin({
+        options: {
+            postcss: [
+                autoprefixer({
+                    browsers: ['last 4 version']
+                })
+            ]
+        }
+    }),
+    new ExtractTextPlugin({ filename: 'css/[name].css', disable: !isProduction }),
     new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin([
       { from: 'src/images', to: 'images' },
@@ -115,14 +136,6 @@ var config = {
 }
 
 if (isProduction) {
-  config.module.rules.shift();
-  config.module.rules.push({
-    test: /\.css$/,
-    use: ExtractTextPlugin.extract({
-      fallback: "style-loader",
-      use: "css-loader"
-    })
-  })
   config.plugins.push(new webpack.DefinePlugin({
     'process.env': {
       'NODE_ENV': JSON.stringify('production')
@@ -132,7 +145,6 @@ if (isProduction) {
     minimize: true,
     debug: false
   }))
-  config.plugins.push(new ExtractTextPlugin({ filename: 'css/[name].css' }))
 }
 
 module.exports = config;
